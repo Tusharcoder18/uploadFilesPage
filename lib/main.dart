@@ -1,4 +1,5 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,8 +13,49 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final _formKey = GlobalKey<FormState>();
-  List<String> countries = ['India', 'USA', 'China', 'Japan', 'Russia'];
-  List<String> languages = ['Hindi', 'English', 'Chinese', 'Japanese', 'Russian'];
+  String type = 'TYPE A';
+  List<String> countries = [
+    'India',
+    'USA',
+    'China',
+    'Japan',
+    'Russia',
+    'United Kingdom'
+  ];
+  // List types = [{'display':'TYPE A','value':'1'},{'display':'TYPE B', 'value':'2'}];
+  List<String> languages = [
+    'Hindi',
+    'English',
+    'Chinese',
+    'Japanese',
+    'Russian'
+  ];
+
+  createDropDownMenuItem() {
+    DropdownMenuItem type1 = DropdownMenuItem(
+      child: Row(
+        children: <Widget>[
+          Text('Type A')
+        ],
+      ),
+      onTap: () {
+        print('DropDownMenu called!');
+      },
+    );
+    DropdownMenuItem type2 = DropdownMenuItem(
+      child: Row(
+        children: <Widget>[
+          Text('Type B')
+        ],
+      ),
+      onTap: () {
+        print('DropDownMenu called!');
+      },
+    );
+    List<DropdownMenuItem<dynamic>> myDropList = [type1, type2];
+    return myDropList;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -48,7 +90,25 @@ class _MyAppState extends State<MyApp> {
                     return value.isEmpty ? 'Please fill this!' : null;
                   },
                 ),
-                SearchBox(context, countries),
+                SearchBox(
+                  context: context,
+                  myList: countries,
+                  label: 'Country',
+                ),
+                DropdownButtonFormField(
+                  // value: 'TYPE',
+                  items: createDropDownMenuItem(),
+                  onChanged: (value) {
+                    setState(() {
+                      
+                    });
+                  },
+                ),
+                SearchBox(
+                  context: context,
+                  myList: languages,
+                  label: 'Language',
+                ),
               ],
             ),
           ),
@@ -61,7 +121,8 @@ class _MyAppState extends State<MyApp> {
 class SearchBox extends StatefulWidget {
   final BuildContext context;
   final List<String> myList;
-  SearchBox(this.context, this.myList);
+  final String label;
+  SearchBox({this.context, this.myList, this.label});
 
   @override
   _SearchBoxState createState() => _SearchBoxState(this.context, this.myList);
@@ -73,24 +134,31 @@ class _SearchBoxState extends State<SearchBox> {
   _SearchBoxState(this.context, this.myList);
 
   GlobalKey<AutoCompleteTextFieldState<String>> key = new GlobalKey();
-  
+
   @override
   Widget build(context) {
     List<String> myList = this.myList;
     List<String> added = [];
-     String currentText = "";
+    String currentText = "";
+    TextEditingController controller = TextEditingController(text: '');
     return SimpleAutoCompleteTextField(
       key: key,
-      // decoration: new InputDecoration(errorText: "Beans"),
-      controller: TextEditingController(text: added.isEmpty ? 'Country': added[0]),
+      decoration: new InputDecoration(
+          labelText: widget.label, hintText: 'Your country name'),
+      controller: controller,
       suggestions: myList,
       textChanged: (text) => currentText = text,
       clearOnSubmit: true,
+      submitOnSuggestionTap: true,
       textSubmitted: (text) => setState(() {
-            if (text != "") {
-              added.add(text);
-            }
-          }),
+        if (text != "") {
+          added.add(text);
+          controller.addListener(() {
+            controller.value = TextEditingValue(text: text);
+          });
+        }
+        print(added);
+      }),
     );
   }
 }
