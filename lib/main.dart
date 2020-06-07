@@ -14,7 +14,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final _formKey = GlobalKey<FormState>();
-  String type = '';
+  String type = 'TYPE A';
   List<String> countries = [
     'India',
     'USA',
@@ -23,7 +23,10 @@ class _MyAppState extends State<MyApp> {
     'Russia',
     'United Kingdom'
   ];
-  // List types = [{'display':'TYPE A','value':'1'},{'display':'TYPE B', 'value':'2'}];
+  List types = [
+    {'display': 'TYPE A', 'value': '1'},
+    {'display': 'TYPE B', 'value': '2'}
+  ];
   List<String> languages = [
     'Hindi',
     'English',
@@ -32,27 +35,6 @@ class _MyAppState extends State<MyApp> {
     'Russian'
   ];
 
-  createDropDownMenuItem() {
-    DropdownMenuItem<String> type1 = DropdownMenuItem(
-      child: Row(
-        children: <Widget>[Text('Type A')],
-      ),
-      onTap: () {
-        print('DropDownMenu called!');
-      },
-    );
-    DropdownMenuItem<String> type2 = DropdownMenuItem(
-      child: Row(
-        children: <Widget>[Text('Type B')],
-      ),
-      onTap: () {
-        print('DropDownMenu called!');
-      },
-    );
-    List<DropdownMenuItem<String>> myDropList = [type1, type2];
-    return myDropList;
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -60,6 +42,14 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         brightness: Brightness.dark,
         fontFamily: 'OpenSans',
+        textTheme: TextTheme(
+          headline1: TextStyle(
+            fontSize: 15.0,
+            fontWeight: FontWeight.w100,
+            color: Color.fromRGBO(255, 255, 255, 0.7),
+          ),
+          bodyText1: TextStyle(fontSize: 15.0, fontFamily: 'Hind'),
+        ),
       ),
       home: Scaffold(
         appBar: AppBar(
@@ -93,31 +83,30 @@ class _MyAppState extends State<MyApp> {
                   label: 'Country',
                 ),
                 DropdownButtonFormField(
-                  // value: 'TYPE',
-                  items: createDropDownMenuItem(),
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                ),
-                // SearchBox(
-                //   context: context,
-                //   myList: languages,
-                //   label: 'Language',
-                // ),
-                SearchableDropdown.single(
-                  items: languages.map((item) {
-                    return new DropdownMenuItem(child: Text(item));
+                  items: types.map((item) {
+                    return DropdownMenuItem(
+                      child: Row(
+                        children: <Widget>[
+                          Text(item['display']),
+                        ],
+                      ),
+                    );
                   }).toList(),
-                  value: type,
-                  hint: 'Select one',
-                  searchHint: 'Select one',
                   onChanged: (value) {
                     setState(() {
                       type = value;
                     });
                   },
-                  isExpanded: true,
                 ),
+                SearchBox(
+                  context: context,
+                  myList: languages,
+                  label: 'Language',
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Synopsis(),
               ],
             ),
           ),
@@ -153,7 +142,9 @@ class _SearchBoxState extends State<SearchBox> {
     return SimpleAutoCompleteTextField(
       key: key,
       decoration: new InputDecoration(
-          labelText: widget.label, hintText: 'Your country name'),
+          labelText: widget.label,
+          hintText: 'Your country name',
+          suffixIcon: Icon(Icons.arrow_drop_down)),
       controller: controller,
       suggestions: myList,
       textChanged: (text) => currentText = text,
@@ -168,6 +159,37 @@ class _SearchBoxState extends State<SearchBox> {
         }
         print(added);
       }),
+    );
+  }
+}
+
+class Synopsis extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Synopsis(Mandatory)',
+              style: Theme.of(context).textTheme.headline1,
+            ),
+          ],
+        ),
+        SizedBox(height:10),
+        Row(
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Icon(Icons.check_box, color: Colors.white, size: 20.0,),
+            SizedBox(width:5),
+            Container(
+              child:Expanded(child: Text('Importantly, there is no nudity allowed at all and attempts will result in a loss of account and submission of content to local authorities for prosecution. ')),),
+          ],
+        ),
+      ],
     );
   }
 }
