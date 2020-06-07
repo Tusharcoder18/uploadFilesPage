@@ -1,6 +1,7 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
-import 'package:dropdown_formfield/dropdown_formfield.dart';
+// import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:searchable_dropdown/searchable_dropdown.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,7 +14,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final _formKey = GlobalKey<FormState>();
-  String type = 'TYPE A';
+  String type = '';
   List<String> countries = [
     'India',
     'USA',
@@ -32,27 +33,23 @@ class _MyAppState extends State<MyApp> {
   ];
 
   createDropDownMenuItem() {
-    DropdownMenuItem type1 = DropdownMenuItem(
+    DropdownMenuItem<String> type1 = DropdownMenuItem(
       child: Row(
-        children: <Widget>[
-          Text('Type A')
-        ],
+        children: <Widget>[Text('Type A')],
       ),
       onTap: () {
         print('DropDownMenu called!');
       },
     );
-    DropdownMenuItem type2 = DropdownMenuItem(
+    DropdownMenuItem<String> type2 = DropdownMenuItem(
       child: Row(
-        children: <Widget>[
-          Text('Type B')
-        ],
+        children: <Widget>[Text('Type B')],
       ),
       onTap: () {
         print('DropDownMenu called!');
       },
     );
-    List<DropdownMenuItem<dynamic>> myDropList = [type1, type2];
+    List<DropdownMenuItem<String>> myDropList = [type1, type2];
     return myDropList;
   }
 
@@ -99,15 +96,27 @@ class _MyAppState extends State<MyApp> {
                   // value: 'TYPE',
                   items: createDropDownMenuItem(),
                   onChanged: (value) {
-                    setState(() {
-                      
-                    });
+                    setState(() {});
                   },
                 ),
-                SearchBox(
-                  context: context,
-                  myList: languages,
-                  label: 'Language',
+                // SearchBox(
+                //   context: context,
+                //   myList: languages,
+                //   label: 'Language',
+                // ),
+                SearchableDropdown.single(
+                  items: languages.map((item) {
+                    return new DropdownMenuItem(child: Text(item));
+                  }).toList(),
+                  value: type,
+                  hint: 'Select one',
+                  searchHint: 'Select one',
+                  onChanged: (value) {
+                    setState(() {
+                      type = value;
+                    });
+                  },
+                  isExpanded: true,
                 ),
               ],
             ),
