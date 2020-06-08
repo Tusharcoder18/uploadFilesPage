@@ -1,6 +1,7 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 // import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:searchable_dropdown/searchable_dropdown.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,7 +15,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final _formKey = GlobalKey<FormState>();
   String name;
-  String type = 'TYPE A';
+  String type;
   String language;
   String country;
   String synopsis;
@@ -25,11 +26,23 @@ class _MyAppState extends State<MyApp> {
     'China',
     'Japan',
     'Russia',
-    'United Kingdom'
+    'United Kingdom',
+    'Argentina',
+    'Brazil',
+    'Denmark',
+    'Fiji',
+    'Ghana',
+    'Japan',
+    'Madagascar',
+    'Nigeria',
+    'Indonesia',
+    'Iceland',
+    'Palau',
+    'Zimbabwe',
   ];
   List types = [
-    {'display': 'TYPE A', 'value': '1'},
-    {'display': 'TYPE B', 'value': '2'}
+    {'display': 'TYPE A', 'value': 'TYPE A'},
+    {'display': 'TYPE B', 'value': 'TYPE B'}
   ];
   List<String> languages = [
     'Hindi',
@@ -38,7 +51,7 @@ class _MyAppState extends State<MyApp> {
     'Japanese',
     'Russian'
   ];
-  List<String> production = ['Production A', 'Production B', 'Production A'];
+  List<String> production = ['Production A', 'Production B', 'Production C'];
   List<String> terms = [
     """ Importantly, there is no nudity allowed at all and attempts
 will result in a loss of account and submission of content
@@ -56,6 +69,8 @@ to as large an audience as possible and two..
   ];
   String extaText =
       """(Must be under 12 mins, also note it is our opinion that if videos are not done in English,that is the best chance to achieve max viewership is with subtitles.)""";
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +108,6 @@ to as large an audience as possible and two..
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: ListView(
-              // crossAxisAlignment: CrossAxisAlignment.center,
               padding: EdgeInsets.all(15),
               children: <Widget>[
                 TextFormField(
@@ -102,18 +116,25 @@ to as large an audience as possible and two..
                     labelText: 'Name',
                   ),
                   validator: (value) {
-                    if (value != null) {
+                    setState(() {
                       name = value;
-                    }
-                    return value;
+                    
+                    });
                   },
                 ),
-                SearchBox(
-                  context: context,
+                SearchableField(
                   myList: countries,
                   label: 'Country',
                 ),
                 DropdownButtonFormField(
+                  // key: _formKey,
+                  value: type,
+                  hint: Text('TYPE'),
+                  decoration: InputDecoration(
+                      suffixIcon: Icon(
+                    Icons.close,
+                    color: Color.fromRGBO(255, 255, 255, 0.2),
+                  )),
                   items: types.map((item) {
                     return DropdownMenuItem(
                       child: Row(
@@ -121,16 +142,24 @@ to as large an audience as possible and two..
                           Text(item['display']),
                         ],
                       ),
+                      value: item['value'],
                     );
                   }).toList(),
-                  onChanged: (value) {
+                  onChanged: (item) {
                     setState(() {
-                      type = value;
+                      type = item.value;
                     });
                   },
+                  validator: (value) {
+                    setState(() {
+                      if (value != null) {
+                        type = value;
+                      }
+                    });
+                    // return value;
+                  },
                 ),
-                SearchBox(
-                  context: context,
+                SearchableField(
                   myList: languages,
                   label: 'Language',
                 ),
@@ -158,8 +187,7 @@ to as large an audience as possible and two..
                   extraText: extaText,
                   iconNeeded: false,
                 ),
-                SearchBox(
-                  context: context,
+                SearchableField(
                   myList: production,
                   label: 'Production House',
                 ),
@@ -169,16 +197,19 @@ to as large an audience as possible and two..
                     labelText: 'Production House E-mail',
                   ),
                   validator: (value) {
+                    setState(() {
                     if (value != null) {
                       productionMail = value;
-                    }
+                    }  
+                    });
                   },
                 ),
                 SizedBox(height: 15),
                 RaisedButton(
                   onPressed: () {
-                    if(_formKey.currentState.validate()) {
+                    if (_formKey.currentState.validate()) {
                       print('Name: $name');
+                      print('Type: $type');
                       print('Production Mail: $productionMail');
                     }
                   },
@@ -198,60 +229,7 @@ to as large an audience as possible and two..
   }
 }
 
-class SearchBox extends StatefulWidget {
-  final BuildContext context;
-  final List<String> myList;
-  final String label;
-  SearchBox({this.context, this.myList, this.label});
-
-  @override
-  _SearchBoxState createState() => _SearchBoxState(this.context, this.myList);
-}
-
-class _SearchBoxState extends State<SearchBox> {
-  BuildContext context;
-  List<String> myList;
-  _SearchBoxState(this.context, this.myList);
-
-  GlobalKey<AutoCompleteTextFieldState<String>> key = new GlobalKey();
-  // List<String> myList = this.myList;
-    List<String> added = [];
-    String currentText = "";
-    TextEditingController controller = TextEditingController(text: '');
-
-  getDetails() async {
-    return added == null ? 'Empty' : added[0];
-  }
-
-  @override
-  Widget build(context) {
-    return SimpleAutoCompleteTextField(
-      key: key,
-      decoration: new InputDecoration(
-          labelText: widget.label,
-          hintText: 'Your ${widget.label} name',
-          suffixIcon: Icon(Icons.arrow_drop_down)),
-      controller: controller,
-      suggestions: myList,
-      textChanged: (text) => currentText = text,
-      clearOnSubmit: true,
-      submitOnSuggestionTap: true,
-      textSubmitted: (text) => setState(() {
-        if (text != "") {
-          added.add(text);
-          
-          controller.addListener(() {
-            controller.value = TextEditingValue(text: text);
-          });
-        }
-        print(added);
-      }),
-    );
-  }
-}
-
 class Synopsis extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -277,9 +255,7 @@ class Synopsis extends StatelessWidget {
               filled: true,
             ),
             validator: (value) {
-              if (value != null) {
-                
-              }
+              if (value != null) {}
             },
           ),
         ),
@@ -368,6 +344,66 @@ class UploadButton extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class SearchableField extends StatefulWidget {
+  final String label;
+  final List<String> myList;
+
+  SearchableField({this.label, this.myList});
+
+  @override
+  _SearchableFieldState createState() => _SearchableFieldState();
+}
+
+class _SearchableFieldState extends State<SearchableField> {
+  String selectedValue = '';
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: SearchableDropdown.single(
+        value: selectedValue,
+        items: widget.myList.map((item) {
+          return DropdownMenuItem(
+            child: Text(item),
+            value: item,
+          );
+        }).toList(),
+        hint: widget.label,
+        searchHint: 'Select ${widget.label}',
+        dialogBox: true,
+        isExpanded: true,
+        onChanged: (value) {
+          setState(() {
+            selectedValue = value;
+          });
+        },
+        searchFn: (String keyword, items) {
+          List<int> ret = List<int>();
+          if (keyword != null && items != null && keyword.isNotEmpty) {
+            keyword.split(" ").forEach((k) {
+              int i = 0;
+              items.forEach((item) {
+                if (k.isNotEmpty &&
+                    (item.value
+                        .toString()
+                        .toLowerCase()
+                        .contains(k.toLowerCase()))) {
+                  ret.add(i);
+                }
+                i++;
+              });
+            });
+          }
+          if (keyword.isEmpty) {
+            ret = Iterable<int>.generate(items.length).toList();
+          }
+          return (ret);
+        },
+      ),
     );
   }
 }
